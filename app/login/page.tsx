@@ -5,14 +5,70 @@ import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import Toast from '@/components/ui/Toast';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  
+  // Form States
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // UI States
+  const [error, setError] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    // Basic Validation
+    if (!email || !password) {
+      setError('Email dan password harus diisi');
+      return;
+    }
+    
+    if (!email.includes('@')) {
+      setError('Format email tidak valid');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password minimal 6 karakter');
+      return;
+    }
+
+    if (!isLogin && password !== confirmPassword) {
+      setError('Password tidak sama');
+      return;
+    }
+
+    // Simulate API Call
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setToast({
+        message: isLogin ? 'Berhasil masuk!' : 'Akun berhasil dibuat!',
+        type: 'success'
+      });
+      // Here you would redirect or update auth state
+    }, 1500);
+  };
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background relative">
       <Navbar />
+      
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
       
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-md mx-auto">
@@ -51,7 +107,17 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {/* Error Alert */}
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {error}
+                </div>
+              )}
+
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-2">Email</label>
@@ -59,6 +125,8 @@ export default function LoginPage() {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
                   <input
                     type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="nama@email.com"
                     className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                   />
@@ -72,6 +140,8 @@ export default function LoginPage() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-12 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                   />
@@ -93,6 +163,8 @@ export default function LoginPage() {
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
                     <input
                       type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="••••••••"
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                     />
@@ -112,10 +184,11 @@ export default function LoginPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLogin ? 'Masuk' : 'Daftar Sekarang'}
-                <ArrowRight size={20} />
+                {isLoading ? 'Memproses...' : (isLogin ? 'Masuk' : 'Daftar Sekarang')}
+                {!isLoading && <ArrowRight size={20} />}
               </button>
             </form>
 

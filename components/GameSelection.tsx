@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Search, Flame } from 'lucide-react';
+import Skeleton from '@/components/ui/Skeleton';
 
 const categories = ["Semua", "MOBA", "Battle Royale", "RPG", "FPS"];
 
@@ -19,6 +20,15 @@ const games = [
 const GameSelection = () => {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredGames = games.filter(game => {
     const matchesCategory = activeCategory === "Semua" || game.category === activeCategory;
@@ -69,9 +79,16 @@ const GameSelection = () => {
       </div>
 
       {/* Grid - Benerin Alignment di sini */}
-      {filteredGames.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full">
-          {filteredGames.map((game) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full">
+        {isLoading ? (
+          // Skeleton Loading
+          Array.from({ length: 8 }).map((_, idx) => (
+            <div key={idx} className="aspect-[3/4] rounded-[2.5rem] overflow-hidden">
+               <Skeleton className="w-full h-full" />
+            </div>
+          ))
+        ) : filteredGames.length > 0 ? (
+          filteredGames.map((game) => (
             <div 
               key={game.id} 
               className="group relative rounded-[2.5rem] overflow-hidden aspect-[3/4] glass border border-white/10 cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20"
@@ -100,13 +117,13 @@ const GameSelection = () => {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="py-20 text-center">
-          <p className="text-white/20 text-xl font-medium">Game tidak ditemukan...</p>
-        </div>
-      )}
+          ))
+        ) : (
+          <div className="col-span-full py-20 text-center">
+            <p className="text-white/20 text-xl font-medium">Game tidak ditemukan...</p>
+          </div>
+        )}
+      </div>
     </section>
   );
 };

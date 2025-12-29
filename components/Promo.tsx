@@ -33,7 +33,16 @@ const promos = [
   }
 ];
 
+import Skeleton from '@/components/ui/Skeleton';
+
 const Promo = () => {
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section className="py-20 bg-muted-purple/20">
       <div className="max-w-7xl mx-auto px-6">
@@ -45,8 +54,15 @@ const Promo = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
-          {promos.map((promo, idx) => (
-            <div key={idx} className="group glass p-8 rounded-[2rem] border border-white/5 relative overflow-hidden transition-all hover:border-primary/30 w-full max-w-sm">
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, idx) => (
+              <div key={idx} className="w-full max-w-sm rounded-[2rem] overflow-hidden">
+                <Skeleton className="w-full h-64 md:h-80" />
+              </div>
+            ))
+          ) : (
+            promos.map((promo, idx) => (
+              <div key={idx} className="group glass p-8 rounded-[2rem] border border-white/5 relative overflow-hidden transition-all hover:border-primary/30 w-full max-w-sm">
               <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${promo.color} blur-[60px] opacity-20 -z-10`} />
               
               <div className="flex justify-between items-start mb-6">
@@ -76,7 +92,8 @@ const Promo = () => {
                 Gunakan Promo
               </button>
             </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </section>

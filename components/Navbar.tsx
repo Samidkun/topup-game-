@@ -1,10 +1,12 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search, ShoppingCart, LogIn } from 'lucide-react';
+import { Search, ShoppingCart, LogIn, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10 px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -52,8 +54,45 @@ const Navbar = () => {
             <LogIn size={18} />
             Masuk
           </Link>
-        </div>
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-3xl border-b border-white/10 p-6 flex flex-col gap-4 shadow-2xl">
+          {[
+            { label: 'Beranda', href: '/' },
+            { label: 'Game', href: '/#games' },
+            { label: 'Promo', href: '/promo' },
+            { label: 'Bantuan', href: '/#faq' },
+            { label: 'Cek Transaksi', href: '/cek-transaksi' },
+          ].map((item) => (
+            <Link 
+              key={item.label} 
+              href={item.href}
+              onClick={() => setIsOpen(false)}
+              className="text-white/70 hover:text-white hover:bg-white/5 p-3 rounded-xl transition-all text-lg font-medium"
+            >
+              {item.label}
+            </Link>
+          ))}
+          <div className="h-px bg-white/10 my-2" />
+          <Link 
+            href="/login"
+            onClick={() => setIsOpen(false)}
+            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white p-3 rounded-xl text-lg font-bold text-center transition-all"
+          >
+            Masuk
+          </Link>
+        </div>
+      )}
     </nav>
   );
 };

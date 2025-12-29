@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, ShoppingCart, Copy, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import Toast from '@/components/ui/Toast';
 
 const nominals = [
   { id: 1, diamonds: 86, bonus: 0, price: 19000 },
@@ -22,9 +24,11 @@ const nominals = [
 ];
 
 export default function GameDetailPage() {
+  const router = useRouter();
   const [selectedNominal, setSelectedNominal] = useState<number | null>(null);
   const [userId, setUserId] = useState('');
   const [serverId, setServerId] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -32,6 +36,23 @@ export default function GameDetailPage() {
       currency: 'IDR',
       minimumFractionDigits: 0,
     }).format(price);
+  };
+
+  const handleCheckout = () => {
+    if (!userId || !serverId) {
+      setToast({ message: 'User ID dan Zone ID harus diisi', type: 'error' });
+      return;
+    }
+    if (!selectedNominal) {
+      setToast({ message: 'Pilih nominal top up', type: 'error' });
+      return;
+    }
+    
+    // Simulate navigation
+    setToast({ message: 'Mengalihkan ke pembayaran...', type: 'success' });
+    setTimeout(() => {
+      router.push('/checkout');
+    }, 1000);
   };
 
   return (
@@ -177,17 +198,13 @@ export default function GameDetailPage() {
                   </div>
                 </div>
 
-                <Link
-                  href="/checkout"
-                  className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
-                    selectedNominal && userId && serverId
-                      ? 'bg-gradient-to-r from-primary to-accent text-white hover:opacity-90'
-                      : 'bg-white/10 text-white/30 cursor-not-allowed'
-                  }`}
+                <button
+                  onClick={handleCheckout}
+                  className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-primary to-accent text-white hover:opacity-90"
                 >
                   <ShoppingCart size={20} />
                   Lanjut ke Pembayaran
-                </Link>
+                </button>
 
                 <p className="text-white/30 text-xs text-center mt-4">
                   Dengan melanjutkan, kamu menyetujui Syarat & Ketentuan
@@ -199,6 +216,13 @@ export default function GameDetailPage() {
       </section>
       
       <Footer />
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
     </main>
   );
 }
