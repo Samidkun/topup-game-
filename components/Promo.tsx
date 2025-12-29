@@ -3,39 +3,27 @@
 import React from 'react';
 import { Tag,Gift, Zap } from 'lucide-react';
 
-const promos = [
+import { useLanguage } from '@/context/LanguageContext';
+import Skeleton from '@/components/ui/Skeleton';
+
+// Static config for visual elements (icons, colors)
+const promoConfig = [
   {
-    title: "Diskon 20% Semua Game",
-    desc: "Untuk pengguna baru dapatkan potongan hingga 20% untuk pembelian pertama",
-    code: "NEWUSER20",
-    date: "31 Des 2023",
     icon: <Tag className="text-white" />,
     color: "from-purple-600 to-indigo-600",
-    badge: "20% OFF"
   },
   {
-    title: "Bonus Diamond Gratis",
-    desc: "Top up 1000 Diamond dapat bonus 100 Diamond untuk Mobile Legends",
-    code: "MLBBPRO",
-    date: "25 Des 2023",
     icon: <Gift className="text-white" />,
     color: "from-orange-600 to-amber-600",
-    badge: "+100 DF"
   },
   {
-    title: "Flash Sale Spesial",
-    desc: "Setiap jam 12:00 & 20:00, diskon hingga 80% untuk game pilihan",
-    code: "FLASH80",
-    date: "Setiap Hari",
     icon: <Zap className="text-white" />,
     color: "from-rose-600 to-pink-600",
-    badge: "50% OFF"
   }
 ];
 
-import Skeleton from '@/components/ui/Skeleton';
-
 const Promo = () => {
+  const { dict } = useLanguage();
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -48,9 +36,9 @@ const Promo = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Promo & <span className="text-accent">Penawaran</span> Terbaik
+            {dict.promo.title} <span className="text-accent">{dict.promo.title_highlight}</span> {dict.promo.title_suffix}
           </h2>
-          <p className="text-white/40">Jangan lewatkan penawaran menarik dan diskon spesial setiap harinya</p>
+          <p className="text-white/40">{dict.promo.subtitle}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
@@ -61,13 +49,13 @@ const Promo = () => {
               </div>
             ))
           ) : (
-            promos.map((promo, idx) => (
+            dict.promo.items.map((promo: any, idx: number) => (
               <div key={idx} className="group glass p-8 rounded-[2rem] border border-white/5 relative overflow-hidden transition-all hover:border-primary/30 w-full max-w-sm">
-              <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${promo.color} blur-[60px] opacity-20 -z-10`} />
+              <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${promoConfig[idx].color} blur-[60px] opacity-20 -z-10`} />
               
               <div className="flex justify-between items-start mb-6">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${promo.color} flex items-center justify-center shadow-lg`}>
-                  {promo.icon}
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${promoConfig[idx].color} flex items-center justify-center shadow-lg`}>
+                  {promoConfig[idx].icon}
                 </div>
                 <div className="bg-white/10 text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/10 uppercase tracking-widest">
                   {promo.badge}
@@ -79,17 +67,17 @@ const Promo = () => {
               
               <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
                 <div>
-                  <div className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-1">Kode Promo</div>
+                  <div className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-1">{dict.promo.code}</div>
                   <div className="text-sm font-mono font-bold text-accent">{promo.code}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-1">Berlaku Hingga</div>
+                  <div className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-1">{dict.promo.valid}</div>
                   <div className="text-sm font-bold text-white/60">{promo.date}</div>
                 </div>
               </div>
 
               <button className="w-full mt-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-bold transition-all uppercase tracking-widest active:scale-[0.98]">
-                Gunakan Promo
+                {dict.promo.use}
               </button>
             </div>
             ))

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Search, Package, Clock, CheckCircle2, XCircle, AlertCircle, Copy, Check } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/context/LanguageContext';
 
 // Dummy transaction data
 const dummyTransactions = [
@@ -36,29 +37,31 @@ const dummyTransactions = [
   },
 ];
 
-const statusConfig = {
-  success: {
-    label: 'Berhasil',
-    icon: <CheckCircle2 size={16} />,
-    color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  },
-  pending: {
-    label: 'Menunggu Pembayaran',
-    icon: <Clock size={16} />,
-    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  },
-  failed: {
-    label: 'Gagal',
-    icon: <XCircle size={16} />,
-    color: 'bg-red-500/20 text-red-400 border-red-500/30',
-  },
-};
-
 export default function CekTransaksiPage() {
+  const { dict } = useLanguage();
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [searchResult, setSearchResult] = useState<typeof dummyTransactions[0] | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Status config moved inside to use dict
+  const statusConfig = {
+    success: {
+      label: dict.checkTransaction.status_success,
+      icon: <CheckCircle2 size={16} />,
+      color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    },
+    pending: {
+      label: dict.checkTransaction.status_pending,
+      icon: <Clock size={16} />,
+      color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+    },
+    failed: {
+      label: dict.checkTransaction.status_failed,
+      icon: <XCircle size={16} />,
+      color: 'bg-red-500/20 text-red-400 border-red-500/30',
+    },
+  };
 
   const handleSearch = () => {
     const result = dummyTransactions.find(
@@ -100,9 +103,9 @@ export default function CekTransaksiPage() {
             <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Package size={32} className="text-primary" />
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">Cek Transaksi</h1>
+            <h1 className="text-4xl font-bold text-white mb-4">{dict.checkTransaction.title}</h1>
             <p className="text-white/50">
-              Masukkan nomor invoice untuk melacak status transaksi kamu
+              {dict.checkTransaction.subtitle}
             </p>
           </div>
 
@@ -113,7 +116,7 @@ export default function CekTransaksiPage() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
                 <input
                   type="text"
-                  placeholder="Masukkan nomor invoice (contoh: INV-2024122900001)"
+                  placeholder={dict.checkTransaction.placeholder}
                   value={invoiceNumber}
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -124,7 +127,7 @@ export default function CekTransaksiPage() {
                 onClick={handleSearch}
                 className="px-8 py-4 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-bold hover:opacity-90 transition-all"
               >
-                Cek
+                {dict.checkTransaction.check_btn}
               </button>
             </div>
           </div>
@@ -133,9 +136,9 @@ export default function CekTransaksiPage() {
           {notFound && (
             <div className="glass p-8 rounded-3xl border border-white/10 text-center">
               <AlertCircle size={48} className="text-white/20 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Transaksi Tidak Ditemukan</h3>
+              <h3 className="text-xl font-bold text-white mb-2">{dict.checkTransaction.not_found_title}</h3>
               <p className="text-white/50">
-                Pastikan nomor invoice yang kamu masukkan sudah benar
+                {dict.checkTransaction.not_found_desc}
               </p>
             </div>
           )}
@@ -157,7 +160,7 @@ export default function CekTransaksiPage() {
               {/* Invoice Number */}
               <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl mb-6">
                 <div>
-                  <div className="text-white/50 text-xs uppercase tracking-wider mb-1">Nomor Invoice</div>
+                  <div className="text-white/50 text-xs uppercase tracking-wider mb-1">{dict.checkTransaction.invoice_label}</div>
                   <div className="text-white font-mono font-bold">{searchResult.invoice}</div>
                 </div>
                 <button
@@ -175,15 +178,15 @@ export default function CekTransaksiPage() {
                   <span className="text-white font-medium">{searchResult.game}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-white/5">
-                  <span className="text-white/50">Item</span>
+                  <span className="text-white/50">{dict.gameDetail.item}</span>
                   <span className="text-white font-medium">{searchResult.item}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-white/5">
-                  <span className="text-white/50">Metode Pembayaran</span>
+                  <span className="text-white/50">{dict.checkTransaction.payment_method}</span>
                   <span className="text-white font-medium">{searchResult.paymentMethod}</span>
                 </div>
                 <div className="flex justify-between py-3">
-                  <span className="text-white/50">Total Pembayaran</span>
+                  <span className="text-white/50">{dict.checkTransaction.total_payment}</span>
                   <span className="text-xl font-bold text-white">{formatPrice(searchResult.price)}</span>
                 </div>
               </div>
@@ -192,10 +195,10 @@ export default function CekTransaksiPage() {
               {searchResult.status === 'pending' && (
                 <div className="mt-8 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
                   <p className="text-yellow-400 text-sm mb-4">
-                    Segera selesaikan pembayaran sebelum waktu habis
+                    {dict.checkTransaction.pay_now_warning}
                   </p>
                   <button className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl transition-colors">
-                    Bayar Sekarang
+                    {dict.checkTransaction.pay_now_btn}
                   </button>
                 </div>
               )}
@@ -204,11 +207,11 @@ export default function CekTransaksiPage() {
 
           {/* Tips */}
           <div className="mt-8 p-6 bg-white/5 rounded-2xl border border-white/5">
-            <h4 className="text-white font-medium mb-3">💡 Tips</h4>
+            <h4 className="text-white font-medium mb-3">💡 {dict.checkTransaction.tips_title}</h4>
             <ul className="text-white/40 text-sm space-y-2">
-              <li>• Nomor invoice dikirim ke email setelah pembelian</li>
-              <li>• Proses top up biasanya selesai dalam 1-5 menit</li>
-              <li>• Hubungi CS jika transaksi bermasalah lebih dari 1 jam</li>
+              {dict.checkTransaction.tips_list.map((tip, index) => (
+                <li key={index}>• {tip}</li>
+              ))}
             </ul>
           </div>
         </div>

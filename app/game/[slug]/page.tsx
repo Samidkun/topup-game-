@@ -7,6 +7,7 @@ import { ArrowLeft, Check, ShoppingCart, Copy, CheckCircle2 } from 'lucide-react
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Toast from '@/components/ui/Toast';
+import { useLanguage } from '@/context/LanguageContext';
 
 const nominals = [
   { id: 1, diamonds: 86, bonus: 0, price: 19000 },
@@ -25,6 +26,7 @@ const nominals = [
 
 export default function GameDetailPage() {
   const router = useRouter();
+  const { dict } = useLanguage();
   const [selectedNominal, setSelectedNominal] = useState<number | null>(null);
   const [userId, setUserId] = useState('');
   const [serverId, setServerId] = useState('');
@@ -40,16 +42,16 @@ export default function GameDetailPage() {
 
   const handleCheckout = () => {
     if (!userId || !serverId) {
-      setToast({ message: 'User ID dan Zone ID harus diisi', type: 'error' });
+      setToast({ message: dict.gameDetail.toast_error_data, type: 'error' });
       return;
     }
     if (!selectedNominal) {
-      setToast({ message: 'Pilih nominal top up', type: 'error' });
+      setToast({ message: dict.gameDetail.toast_error_nominal, type: 'error' });
       return;
     }
     
     // Simulate navigation
-    setToast({ message: 'Mengalihkan ke pembayaran...', type: 'success' });
+    setToast({ message: dict.gameDetail.toast_process, type: 'success' });
     setTimeout(() => {
       router.push('/checkout');
     }, 1000);
@@ -64,7 +66,7 @@ export default function GameDetailPage() {
           {/* Back Button */}
           <Link href="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-8 transition-colors">
             <ArrowLeft size={20} />
-            Kembali ke Beranda
+            {dict.gameDetail.back}
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -82,7 +84,7 @@ export default function GameDetailPage() {
                   <p className="text-white/50 text-sm">Moonton • MOBA</p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-medium rounded-full">Popular</span>
-                    <span className="px-3 py-1 bg-white/10 text-white/60 text-xs font-medium rounded-full">Proses Instan</span>
+                    <span className="px-3 py-1 bg-white/10 text-white/60 text-xs font-medium rounded-full">{dict.gameDetail.process_instant}</span>
                   </div>
                 </div>
               </div>
@@ -91,24 +93,24 @@ export default function GameDetailPage() {
               <div className="glass p-6 rounded-3xl border border-white/10">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   <span className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-sm">1</span>
-                  Masukkan Data Akun
+                  {dict.gameDetail.data_title}
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">User ID</label>
+                    <label className="block text-sm font-medium text-white/70 mb-2">{dict.gameDetail.userid_label}</label>
                     <input
                       type="text"
-                      placeholder="Masukkan User ID"
+                      placeholder={dict.gameDetail.userid_placeholder}
                       value={userId}
                       onChange={(e) => setUserId(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">Zone ID</label>
+                    <label className="block text-sm font-medium text-white/70 mb-2">{dict.gameDetail.zoneid_label}</label>
                     <input
                       type="text"
-                      placeholder="Masukkan Zone ID"
+                      placeholder={dict.gameDetail.zoneid_placeholder}
                       value={serverId}
                       onChange={(e) => setServerId(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
@@ -116,7 +118,7 @@ export default function GameDetailPage() {
                   </div>
                 </div>
                 <p className="text-white/30 text-xs mt-3">
-                  User ID dan Zone ID bisa dilihat di profil game kamu
+                  {dict.gameDetail.helper_text}
                 </p>
               </div>
 
@@ -124,7 +126,7 @@ export default function GameDetailPage() {
               <div className="glass p-6 rounded-3xl border border-white/10">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   <span className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-sm">2</span>
-                  Pilih Nominal
+                  {dict.gameDetail.nominal_title}
                 </h2>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {nominals.map((item) => (
@@ -160,7 +162,7 @@ export default function GameDetailPage() {
             {/* Right: Summary */}
             <div className="lg:col-span-1">
               <div className="glass p-6 rounded-3xl border border-white/10 sticky top-28">
-                <h2 className="text-lg font-bold text-white mb-6">Ringkasan Pesanan</h2>
+                <h2 className="text-lg font-bold text-white mb-6">{dict.gameDetail.summary_title}</h2>
                 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-sm">
@@ -176,7 +178,7 @@ export default function GameDetailPage() {
                     <span className="text-white font-medium">{serverId || '-'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/50">Item</span>
+                    <span className="text-white/50">{dict.gameDetail.item}</span>
                     <span className="text-white font-medium">
                       {selectedNominal 
                         ? `${nominals.find(n => n.id === selectedNominal)?.diamonds} Diamonds`
@@ -188,7 +190,7 @@ export default function GameDetailPage() {
 
                 <div className="border-t border-white/10 pt-4 mb-6">
                   <div className="flex justify-between">
-                    <span className="text-white/50">Total</span>
+                    <span className="text-white/50">{dict.gameDetail.total}</span>
                     <span className="text-2xl font-bold text-white">
                       {selectedNominal 
                         ? formatPrice(nominals.find(n => n.id === selectedNominal)?.price || 0)
@@ -203,11 +205,11 @@ export default function GameDetailPage() {
                   className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-primary to-accent text-white hover:opacity-90"
                 >
                   <ShoppingCart size={20} />
-                  Lanjut ke Pembayaran
+                  {dict.gameDetail.checkout_btn}
                 </button>
 
                 <p className="text-white/30 text-xs text-center mt-4">
-                  Dengan melanjutkan, kamu menyetujui Syarat & Ketentuan
+                  {dict.gameDetail.terms_agree}
                 </p>
               </div>
             </div>

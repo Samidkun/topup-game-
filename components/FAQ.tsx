@@ -35,8 +35,11 @@ const faqs = [
   { q: "Apakah bisa melakukan refund jika salah membeli?", a: "Sayangnya, semua transaksi yang sudah berhasil diproses tidak dapat dibatalkan atau direfund. Harap teliti kembali ID dan nominal sebelum membayar." }
 ];
 
+import { useLanguage } from '@/context/LanguageContext';
+
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { dict } = useLanguage();
 
   return (
     <section className="py-20 bg-muted-purple/10">
@@ -45,9 +48,9 @@ const FAQ = () => {
         <div className="mb-24">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Apa Kata <span className="text-accent">Mereka</span>
+              {dict.faq.testimonials.title} <span className="text-accent">{dict.faq.testimonials.title_highlight}</span>
             </h2>
-            <p className="text-white/40">Testimoni dari ribuan pengguna yang puas dengan layanan kami</p>
+            <p className="text-white/40">{dict.faq.testimonials.subtitle}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
@@ -76,7 +79,7 @@ const FAQ = () => {
                 <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />
               ))}
             </div>
-            <span className="text-white/60 text-sm font-medium">4.9/5 dari 25,000+ review</span>
+            <span className="text-white/60 text-sm font-medium">4.9/5 {dict.faq.testimonials.rating_text}</span>
           </div>
         </div>
 
@@ -84,9 +87,9 @@ const FAQ = () => {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Pertanyaan <span className="text-accent">Umum</span>
+              {dict.faq.questions.title} <span className="text-accent">{dict.faq.questions.title_highlight}</span>
             </h2>
-            <p className="text-white/40">Temukan jawaban untuk pertanyaan yang sering diajukan</p>
+            <p className="text-white/40">{dict.faq.questions.subtitle}</p>
           </div>
 
           <div className="space-y-4">
@@ -112,14 +115,14 @@ const FAQ = () => {
           </div>
 
           <div className="mt-16 glass p-8 rounded-3xl border border-white/5 text-center">
-            <h3 className="text-white font-bold mb-2">Masih punya pertanyaan?</h3>
-            <p className="text-white/40 text-sm mb-6">Tim customer service kami siap membantu Anda 24/7</p>
+            <h3 className="text-white font-bold mb-2">{dict.faq.questions.contact_title}</h3>
+            <p className="text-white/40 text-sm mb-6">{dict.faq.questions.contact_subtitle}</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold transition-all flex items-center gap-2">
-                Hubungi WhatsApp
+                {dict.faq.questions.whatsapp}
               </button>
               <button className="px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-bold transition-all flex items-center gap-2">
-                Live Chat
+                {dict.faq.questions.chat}
               </button>
             </div>
           </div>

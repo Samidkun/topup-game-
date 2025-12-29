@@ -4,7 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { Instagram, Twitter, Facebook, Mail, Phone, MapPin } from 'lucide-react';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 const Footer = () => {
+  const { dict } = useLanguage();
+
   return (
     <footer className="bg-muted-purple/40 pt-20 pb-10 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6">
@@ -18,7 +22,7 @@ const Footer = () => {
               <span className="text-xl font-bold tracking-tight text-white">GameTopUp</span>
             </Link>
             <p className="text-white/40 text-sm leading-relaxed">
-              Platform top up game terpercaya dengan layanan cepat, aman, dan harga termurah untuk semua kebutuhan gaming kamu.
+              {dict.footer.desc}
             </p>
             <div className="flex gap-4">
               {[Instagram, Twitter, Facebook].map((Icon, idx) => (
@@ -31,9 +35,9 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h4 className="text-white font-bold mb-6">Perusahaan</h4>
+            <h4 className="text-white font-bold mb-6">{dict.footer.company.title}</h4>
             <ul className="space-y-4">
-              {['Tentang Kami', 'Karir', 'Blog', 'Mitra'].map((item) => (
+              {dict.footer.company.links.map((item) => (
                 <li key={item}>
                   <Link href="#" className="text-white/40 hover:text-white text-sm transition-colors">{item}</Link>
                 </li>
@@ -43,9 +47,9 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h4 className="text-white font-bold mb-6">Dukungan</h4>
+            <h4 className="text-white font-bold mb-6">{dict.footer.support.title}</h4>
             <ul className="space-y-4">
-              {['Pusat Bantuan', 'FAQ', 'Syarat & Ketentuan', 'Kebijakan Privasi'].map((item) => (
+              {dict.footer.support.links.map((item) => (
                 <li key={item}>
                   <Link href="#" className="text-white/40 hover:text-white text-sm transition-colors">{item}</Link>
                 </li>
@@ -55,7 +59,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-bold mb-6">Kontak Kami</h4>
+            <h4 className="text-white font-bold mb-6">{dict.footer.contact.title}</h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <Mail size={18} className="text-primary mt-0.5" />
@@ -75,11 +79,11 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-white/20 text-xs">
-            © 2023 GameTopUp. All rights reserved. Made with ❤️ for gamers.
+            © 2023 {dict.footer.rights}
           </p>
           <div className="flex gap-8">
-            <Link href="#" className="text-white/20 hover:text-white text-xs transition-colors">Kebijakan Privasi</Link>
-            <Link href="#" className="text-white/20 hover:text-white text-xs transition-colors">Syarat Layanan</Link>
+            <Link href="#" className="text-white/20 hover:text-white text-xs transition-colors">{dict.footer.support.links[3]}</Link>
+            <Link href="#" className="text-white/20 hover:text-white text-xs transition-colors">{dict.footer.support.links[2]}</Link>
           </div>
         </div>
       </div>

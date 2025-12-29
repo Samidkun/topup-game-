@@ -34,14 +34,18 @@ const steps = [
   }
 ];
 
+import { useLanguage } from '@/context/LanguageContext';
+
 const HowToTopUp = () => {
+  const { dict } = useLanguage();
+
   return (
     <section className="py-20 max-w-7xl mx-auto px-6">
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          Cara <span className="text-accent">Top Up</span>
+          {dict.howTo.title} <span className="text-accent">{dict.howTo.title_highlight}</span>
         </h2>
-        <p className="text-white/40">Proses top up sangat mudah dan cepat, hanya 4 langkah sederhana</p>
+        <p className="text-white/40">{dict.howTo.subtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
@@ -54,8 +58,9 @@ const HowToTopUp = () => {
                   {step.num}
                 </div>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-              <p className="text-white/40 text-sm leading-relaxed">{step.desc}</p>
+              {/* Dynamic Step Text */}
+              <h3 className="text-lg font-bold text-white mb-2">{dict.howTo.steps[idx].title}</h3>
+              <p className="text-white/40 text-sm leading-relaxed">{dict.howTo.steps[idx].desc}</p>
             </div>
             
             {/* Connector Line (Desktop) */}

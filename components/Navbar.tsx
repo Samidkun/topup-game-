@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Search, ShoppingCart, LogIn, Menu, X } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { dict, language, setLanguage } = useLanguage();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10 px-6 py-4">
@@ -21,14 +23,14 @@ const Navbar = () => {
         {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
           {[
-            { label: 'Beranda', href: '/' },
-            { label: 'Game', href: '/#games' },
-            { label: 'Promo', href: '/promo' },
-            { label: 'Bantuan', href: '/#faq' },
-            { label: 'Cek Transaksi', href: '/cek-transaksi' },
+            { label: dict.navbar.home, href: '/' },
+            { label: dict.navbar.games, href: '/#games' },
+            { label: dict.navbar.promo, href: '/promo' },
+            { label: dict.navbar.help, href: '/#faq' },
+            { label: dict.navbar.check, href: '/cek-transaksi' },
           ].map((item) => (
             <Link 
-              key={item.label} 
+              key={item.href} 
               href={item.href} 
               className="text-white/70 hover:text-white transition-colors text-sm font-medium"
             >
@@ -37,8 +39,16 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Search, Cart, Login */}
+        {/* Search, Cart, Login, Lang */}
         <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
+            className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-lg hover:bg-white/10 transition-colors"
+            title={language === 'id' ? "Switch to English" : "Ganti ke Bahasa Indonesia"}
+          >
+            {language === 'id' ? '🇬🇧' : '🇮🇩'}
+          </button>
+          
           <button className="p-2 text-white/70 hover:text-white transition-colors">
             <Search size={20} />
           </button>

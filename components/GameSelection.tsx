@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Search, Flame } from 'lucide-react';
 import Skeleton from '@/components/ui/Skeleton';
+import { useLanguage } from '@/context/LanguageContext';
 
 const categories = ["Semua", "MOBA", "Battle Royale", "RPG", "FPS"];
 
@@ -21,6 +22,7 @@ const GameSelection = () => {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const { dict } = useLanguage();
 
   // Simulate loading
   React.useEffect(() => {
@@ -37,14 +39,14 @@ const GameSelection = () => {
   });
 
   return (
-    <section className="py-24 max-w-7xl mx-auto px-6">
+    <section className="py-24 max-w-7xl mx-auto px-6" id="games">
       {/* Header Section - Tetap Center */}
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
-          Pilih <span className="gradient-text">Game Favorit</span>
+          {dict.gameSelection.title} <span className="gradient-text">{dict.gameSelection.title_highlight}</span>
         </h2>
         <p className="text-white/50 max-w-2xl mx-auto text-lg">
-          Tersedia berbagai game populer dengan harga terbaik dan proses tercepat
+          {dict.gameSelection.subtitle}
         </p>
       </div>
 
@@ -70,7 +72,7 @@ const GameSelection = () => {
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20" size={20} />
           <input 
             type="text"
-            placeholder="Cari game favorit kamu..."
+            placeholder={dict.gameSelection.search_placeholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-background/50 border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
@@ -120,7 +122,7 @@ const GameSelection = () => {
           ))
         ) : (
           <div className="col-span-full py-20 text-center">
-            <p className="text-white/20 text-xl font-medium">Game tidak ditemukan...</p>
+            <p className="text-white/20 text-xl font-medium">{dict.gameSelection.not_found}</p>
           </div>
         )}
       </div>
