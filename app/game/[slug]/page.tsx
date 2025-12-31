@@ -1,70 +1,116 @@
 "use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, ShoppingCart, Copy, CheckCircle2 } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import Toast from '@/components/ui/Toast';
-import { useLanguage } from '@/context/LanguageContext';
-
-const nominals = [
-  { id: 1, diamonds: 86, bonus: 0, price: 19000 },
-  { id: 2, diamonds: 172, bonus: 0, price: 38000 },
-  { id: 3, diamonds: 257, bonus: 0, price: 57000 },
-  { id: 4, diamonds: 344, bonus: 0, price: 76000 },
-  { id: 5, diamonds: 429, bonus: 0, price: 95000 },
-  { id: 6, diamonds: 514, bonus: 0, price: 114000 },
-  { id: 7, diamonds: 600, bonus: 14, price: 133000 },
-  { id: 8, diamonds: 706, bonus: 16, price: 152000 },
-  { id: 9, diamonds: 878, bonus: 20, price: 190000 },
-  { id: 10, diamonds: 1050, bonus: 24, price: 228000 },
-  { id: 11, diamonds: 1412, bonus: 32, price: 304000 },
-  { id: 12, diamonds: 2195, bonus: 50, price: 475000 },
-];
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  Check,
+  ShoppingCart,
+  Copy,
+  CheckCircle2,
+} from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import Toast from "@/components/ui/Toast";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function GameDetailPage() {
+  const params = useParams();
   const router = useRouter();
   const { dict } = useLanguage();
-  const [selectedNominal, setSelectedNominal] = useState<number | null>(null);
-  const [userId, setUserId] = useState('');
-  const [serverId, setServerId] = useState('');
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  // State for dynamic data
+  const [game, setGame] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Form states
+  const [selectedNominal, setSelectedNominal] = useState<string | null>(null);
+  const [userId, setUserId] = useState("");
+  const [serverId, setServerId] = useState("");
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  // Fetch game data
+  useEffect(() => {
+    const fetchGame = async () => {
+      try {
+        const res = await fetch(`/api/games/${params.slug}`);
+        const data = await res.json();
+
+        if (data.error) {
+          router.push("/"); // Redirect if game not found
+          return;
+        }
+
+        setGame(data);
+      } catch (error) {
+        console.error("Failed to fetch game:", error);
+        setToast({ message: "Failed to load game data", type: "error" });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (params.slug) {
+      fetchGame();
+    }
+  }, [params.slug, router]);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
       minimumFractionDigits: 0,
     }).format(price);
   };
 
   const handleCheckout = () => {
     if (!userId || !serverId) {
-      setToast({ message: dict.gameDetail.toast_error_data, type: 'error' });
+      setToast({ message: dict.gameDetail.toast_error_data, type: "error" });
       return;
     }
     if (!selectedNominal) {
-      setToast({ message: dict.gameDetail.toast_error_nominal, type: 'error' });
+      setToast({ message: dict.gameDetail.toast_error_nominal, type: "error" });
       return;
     }
-    
+
     // Simulate navigation
-    setToast({ message: dict.gameDetail.toast_process, type: 'success' });
+    setToast({ message: dict.gameDetail.toast_process, type: "success" });
+    const queryparams = new URLSearchParams({
+      slug: game.slug,
+      userid: userId,
+      serverid: serverId,
+      nominal: selectedNominal,
+    }).toString();
     setTimeout(() => {
-      router.push('/checkout');
+      router.push(`/checkout?${queryparams}`);
     }, 1000);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-white animate-pulse">Loading Game Data...</div>
+      </div>
+    );
+  }
+
+  if (!game) return null;
 
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
-      
+
       <section className="pt-28 pb-20 px-6">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
-          <Link href="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-8 transition-colors">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-8 transition-colors"
+          >
             <ArrowLeft size={20} />
             {dict.gameDetail.back}
           </Link>
@@ -74,17 +120,25 @@ export default function GameDetailPage() {
             <div className="lg:col-span-2 space-y-8">
               {/* Game Header */}
               <div className="glass p-6 rounded-3xl border border-white/10 flex items-center gap-6">
-                <img 
-                  src="/images/games/Image (Mobile Legends).png" 
-                  alt="Mobile Legends"
+                <img
+                  src={game.thumbnail}
+                  alt={game.name}
                   className="w-24 h-24 rounded-2xl object-cover"
                 />
                 <div>
-                  <h1 className="text-2xl font-bold text-white mb-2">Mobile Legends: Bang Bang</h1>
-                  <p className="text-white/50 text-sm">Moonton • MOBA</p>
+                  <h1 className="text-2xl font-bold text-white mb-2">
+                    {game.name}
+                  </h1>
+                  <p className="text-white/50 text-sm">
+                    {game.developer} • {game.category}
+                  </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-medium rounded-full">Popular</span>
-                    <span className="px-3 py-1 bg-white/10 text-white/60 text-xs font-medium rounded-full">{dict.gameDetail.process_instant}</span>
+                    <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-medium rounded-full">
+                      Popular
+                    </span>
+                    <span className="px-3 py-1 bg-white/10 text-white/60 text-xs font-medium rounded-full">
+                      {dict.gameDetail.process_instant}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -92,12 +146,16 @@ export default function GameDetailPage() {
               {/* Input User ID */}
               <div className="glass p-6 rounded-3xl border border-white/10">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-sm">1</span>
+                  <span className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-sm">
+                    1
+                  </span>
                   {dict.gameDetail.data_title}
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">{dict.gameDetail.userid_label}</label>
+                    <label className="block text-sm font-medium text-white/70 mb-2">
+                      {dict.gameDetail.userid_label}
+                    </label>
                     <input
                       type="text"
                       placeholder={dict.gameDetail.userid_placeholder}
@@ -107,7 +165,9 @@ export default function GameDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">{dict.gameDetail.zoneid_label}</label>
+                    <label className="block text-sm font-medium text-white/70 mb-2">
+                      {dict.gameDetail.zoneid_label}
+                    </label>
                     <input
                       type="text"
                       placeholder={dict.gameDetail.zoneid_placeholder}
@@ -125,18 +185,20 @@ export default function GameDetailPage() {
               {/* Pilih Nominal */}
               <div className="glass p-6 rounded-3xl border border-white/10">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-sm">2</span>
+                  <span className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-sm">
+                    2
+                  </span>
                   {dict.gameDetail.nominal_title}
                 </h2>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {nominals.map((item) => (
+                  {game.nominals.map((item: any) => (
                     <button
                       key={item.id}
                       onClick={() => setSelectedNominal(item.id)}
                       className={`relative p-4 rounded-2xl border text-left transition-all ${
                         selectedNominal === item.id
-                          ? 'bg-primary/20 border-primary'
-                          : 'bg-white/5 border-white/10 hover:border-white/20'
+                          ? "bg-primary/20 border-primary"
+                          : "bg-white/5 border-white/10 hover:border-white/20"
                       }`}
                     >
                       {selectedNominal === item.id && (
@@ -145,10 +207,7 @@ export default function GameDetailPage() {
                         </div>
                       )}
                       <div className="text-white font-bold">
-                        {item.diamonds} 💎
-                        {item.bonus > 0 && (
-                          <span className="text-accent text-xs ml-1">+{item.bonus}</span>
-                        )}
+                        {item.amount} 💎
                       </div>
                       <div className="text-white/50 text-sm mt-1">
                         {formatPrice(item.price)}
@@ -162,40 +221,56 @@ export default function GameDetailPage() {
             {/* Right: Summary */}
             <div className="lg:col-span-1">
               <div className="glass p-6 rounded-3xl border border-white/10 sticky top-28">
-                <h2 className="text-lg font-bold text-white mb-6">{dict.gameDetail.summary_title}</h2>
-                
+                <h2 className="text-lg font-bold text-white mb-6">
+                  {dict.gameDetail.summary_title}
+                </h2>
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-sm">
                     <span className="text-white/50">Game</span>
-                    <span className="text-white font-medium">Mobile Legends</span>
+                    <span className="text-white font-medium">{game.name}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-white/50">User ID</span>
-                    <span className="text-white font-medium">{userId || '-'}</span>
+                    <span className="text-white font-medium">
+                      {userId || "-"}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-white/50">Zone ID</span>
-                    <span className="text-white font-medium">{serverId || '-'}</span>
+                    <span className="text-white font-medium">
+                      {serverId || "-"}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/50">{dict.gameDetail.item}</span>
+                    <span className="text-white/50">
+                      {dict.gameDetail.item}
+                    </span>
                     <span className="text-white font-medium">
-                      {selectedNominal 
-                        ? `${nominals.find(n => n.id === selectedNominal)?.diamonds} Diamonds`
-                        : '-'
-                      }
+                      {selectedNominal
+                        ? `${
+                            game.nominals.find(
+                              (n: any) => n.id === selectedNominal
+                            )?.amount
+                          } Diamonds`
+                        : "-"}
                     </span>
                   </div>
                 </div>
 
                 <div className="border-t border-white/10 pt-4 mb-6">
                   <div className="flex justify-between">
-                    <span className="text-white/50">{dict.gameDetail.total}</span>
+                    <span className="text-white/50">
+                      {dict.gameDetail.total}
+                    </span>
                     <span className="text-2xl font-bold text-white">
-                      {selectedNominal 
-                        ? formatPrice(nominals.find(n => n.id === selectedNominal)?.price || 0)
-                        : '-'
-                      }
+                      {selectedNominal
+                        ? formatPrice(
+                            game.nominals.find(
+                              (n: any) => n.id === selectedNominal
+                            )?.price || 0
+                          )
+                        : "-"}
                     </span>
                   </div>
                 </div>
@@ -216,13 +291,13 @@ export default function GameDetailPage() {
           </div>
         </div>
       </section>
-      
+
       <Footer />
       {toast && (
-        <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          onClose={() => setToast(null)} 
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </main>
