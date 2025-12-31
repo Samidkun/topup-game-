@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  password  String
+  role      String    @default("USER") // USER, ADMIN
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  transactions Transaction[]
+}
+
+model Game {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  developer String
+  category  String    // MOBA, FPS, RPG
+  thumbnail String
+  banner    String?
+  
+  nominals  Nominal[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Nominal {
+  id        String  @id @default(cuid())
+  name      String
+  amount    Int     // Jumlah item (e.g. 100 Diamonds)
+  price     Float
+  gameId    String
+  game      Game    @relation(fields: [gameId], references: [id])
+  
+  transactions Transaction[]
+}
+
+model PaymentMethod {
+  id        String  @id @default(cuid())
+  name      String
+  code      String  @unique // e.g. gopay, bca_va
+  category  String  // E-Wallet, VA, Retail
+  adminFee  Float   @default(0)
+  icon      String?
+  
+  transactions Transaction[]
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  invoice         String   @unique
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  
+  nominalId       String
+  nominal         Nominal  @relation(fields: [nominalId], references: [id])
+  
+  paymentId       String
+  paymentMethod   PaymentMethod @relation(fields: [paymentId], references: [id])
+  
+  targetUserId    String   // ID Player
+  targetZoneId    String?  // Zone ID (Optional)
+  
+  totalPrice      Float
+  status          String   @default("PENDING") // PENDING, PAID, SUCCESS, FAILED
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

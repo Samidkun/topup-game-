@@ -7,29 +7,28 @@ import { useLanguage } from '@/context/LanguageContext';
 
 const categories = ["Semua", "MOBA", "Battle Royale", "RPG", "FPS"];
 
-const games = [
-  { id: 1, name: "Mobile Legends", category: "MOBA", image: "/images/games/Image (Mobile Legends).png", tag: "Hot" },
-  { id: 2, name: "Free Fire", category: "Battle Royale", image: "/images/games/Image (Free Fire).png", tag: "Popular" },
-  { id: 3, name: "PUBG Mobile", category: "Battle Royale", image: "/images/games/Image (PUBG Mobile).png", tag: "Popular" },
-  { id: 4, name: "Genshin Impact", category: "RPG", image: "/images/games/Image (Genshin Impact).png", tag: "New" },
-  { id: 5, name: "Call of Duty Mobile", category: "FPS", image: "/images/games/Image (Call of Duty Mobile).png", tag: "" },
-  { id: 6, name: "Valorant", category: "FPS", image: "/images/games/Image (Valorant).png", tag: "Hot" },
-  { id: 7, name: "League of Legends", category: "MOBA", image: "/images/games/Image (League of Legends).png", tag: "" },
-  { id: 8, name: "Arena of Valor", category: "MOBA", image: "/images/games/Image (Arena of Valor).png", tag: "" },
-];
 
 const GameSelection = () => {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
+  const [games, setGames] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { dict } = useLanguage();
 
-  // Simulate loading
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    const fetchGames = async () => {
+      try {
+        const res = await fetch('/api/games');
+        const data = await res.json();
+        setGames(data);
+      } catch (error) {
+        console.error('Failed to fetch games:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGames();
   }, []);
 
   const filteredGames = games.filter(game => {
@@ -96,19 +95,18 @@ const GameSelection = () => {
               className="group relative rounded-[2.5rem] overflow-hidden aspect-[3/4] glass border border-white/10 cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20"
             >
               <img 
-                src={game.image} 
+                src={game.thumbnail} 
                 alt={game.name} 
                 className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
               />
               {/* Overlay yang lebih gelap di bawah biar teks kebaca */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
               
-              {game.tag && (
-                <div className="absolute top-5 right-5 bg-gradient-to-r from-orange-600 to-amber-500 text-white text-[10px] font-black px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg uppercase tracking-wider">
-                  <Flame size={12} fill="white" />
-                  {game.tag}
-                </div>
-              )}
+              {/* Using dummy tag as DB might not have tags yet */}
+              <div className="absolute top-5 right-5 bg-gradient-to-r from-orange-600 to-amber-500 text-white text-[10px] font-black px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg uppercase tracking-wider">
+                <Flame size={12} fill="white" />
+                Hot
+              </div>
 
               <div className="absolute bottom-8 left-8 right-8">
                 <h3 className="text-white font-bold text-xl mb-2 group-hover:text-primary transition-colors line-clamp-1">{game.name}</h3>
